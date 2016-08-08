@@ -2,13 +2,21 @@
 
 public class CircularBoostBar : MonoBehaviour {
 
-	public Renderer renderer;
+	Renderer renderer;    
 	
 	void Start () {
         renderer = GetComponent<Renderer>();
 	}
 
 	void Update () {
-        renderer.material.mainTextureOffset = new Vector2(1-(Score.ScoreNum / Score.MaxScore), 0);
+
+        float score = (Score.ScoreNum / Score.MaxScore);
+
+        //textureOffset 0.5 = 0% boost
+        //textureOffset -0.5 = 100% boost
+
+        float textrueOfset = -0.5f + (1.0f - score);
+
+        renderer.material.mainTextureOffset = new Vector2(textrueOfset, 0.0f);
     }
 }
