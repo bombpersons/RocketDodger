@@ -5,9 +5,9 @@ public class SoftFollow : MonoBehaviour {
 	
 	// Public vars
 	public Transform target;
-	public Vector3 mapSize = new Vector3(100, 0, 100);
+	public Vector3 mapSize = new Vector3(10000, 0, 10000);
 	
-	const float FOLLOW_MAX_DIST = 99.62f;
+	const float FOLLOW_MAX_DIST = 9962.00f;
 	
 	Vector3 restartLerpStartPos;
 	
