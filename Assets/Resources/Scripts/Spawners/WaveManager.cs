@@ -18,10 +18,10 @@ public class WaveManager : MonoBehaviour {
 		}
 		
 		// Private vars
-		List<WaveEntry> entries = new List<WaveEntry>();
-		
-		// Constructor
-		public Wave() {
+		List<WaveEntry> entries = new List<WaveEntry>();        
+
+        // Constructor
+        public Wave() {
 		}
 		
 		// Sort
@@ -166,9 +166,11 @@ public class WaveManager : MonoBehaviour {
 	static float currentTimer;
 	static GameObject textPrefab;
 	static int waveNum;
-	
-	// Random generation values
-	static float difficultyTimeModifier = 10; // How much to drop the percieved difficulty of a rocket per second after the last rocket was spawned.
+
+    
+
+    // Random generation values
+    static float difficultyTimeModifier = 10; // How much to drop the percieved difficulty of a rocket per second after the last rocket was spawned.
 	
 	
 	// Stop
@@ -199,10 +201,12 @@ public class WaveManager : MonoBehaviour {
 
 	// Generate a wave worth a certain point.
 	public static Wave GenerateRandomWave(float _num) {
-		// Using the difficulty number, calculate a few values
-		
-		// How closely the rockets will be spawned together.
-		float spawnDensity = (1 / (_num + 1)) * 50;
+
+        System.Random detRand = new System.Random(1337 + waveNum);//determanistic random number
+                                     // Using the difficulty number, calculate a few values
+
+        // How closely the rockets will be spawned together.
+        float spawnDensity = (1 / (_num + 1)) * 50;
 		if (spawnDensity < 0.01f) spawnDensity = 0.01f;
 		float lowRange = spawnDensity - (spawnDensity / 4);
 		float highRange = spawnDensity + (spawnDensity / 4);
@@ -214,85 +218,99 @@ public class WaveManager : MonoBehaviour {
 		Wave wave = new Wave();
 		float time = 5.0f;
 		bool firstRocket = true;
-		while (_num > 0) {
-			WaveEntry entry = new WaveEntry();
-			
-			// Get a random angle.
-			float angle = Random.Range(-Mathf.PI, Mathf.PI);
-			entry.Position = new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle));			
-			
-			// Get a random rocket type.
-			int type = Random.Range(0, 4);
-			switch (type) {
-			case 0:
-				entry.Type = "PointAtRocket";
-				break;
-			case 1:
-				entry.Type = "ProportionalRocket";
-				break;
-			case 2:
-				entry.Type = "Leading";
-				break;
-			case 3:
-				entry.Type = "ClusterRocket";
-				break;
-			default:
-				entry.Type = "PointAtRocket";
-				break;
-			}
-			
-			// Get a random time.
-			float extraTime = Random.Range(lowRange, highRange);
-			
-			// Calculate the difficulty of this rocket.
-			float diff = GetDifficulty(entry, extraTime, lowRange, highRange);
-			
-			// Check if we can spawn this rocket.
-			while (diff > maxDiff) {
-				// Try increasing the time to spawn it.
-				extraTime += (highRange - lowRange) / 10;
-				
-				// If we are at the max extratime
-				if (extraTime > highRange) {
-					extraTime = highRange;
-					
-					// Try making the rocket easier.
-					bool found = false;
-					foreach (KeyValuePair<string, float> pair in RocketDifficulty) {
-						if (pair.Value < RocketDifficulty[entry.Type]) {
-							entry.Type = pair.Key;
-							found = true;
-							break;
-						}
-					}
-					if (found == false) {
-						// Nothing else we can do to make it any easier, just set _num to 0 and start the next wave.
-						_num = 0;
-						return wave;
-					}
-				}
-				
-				// Recalculate the difficulty
-				diff = GetDifficulty(entry, extraTime, lowRange, highRange);
-			}
-			
-			// Take the diff away.
-			_num -= diff;
+		while (_num > 0)
+        {
+            WaveEntry entry = new WaveEntry();
+            float angle = RandInRange(detRand, -Mathf.PI, Mathf.PI);
+            entry.Position = new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle));
 
-			// Add to the wave
-			if (firstRocket) { // If this is the first rocket, then spawn it first regardless of the time that was previously calculated.
-				firstRocket = false;
-			} else {
-				time += extraTime;
-			}
-			entry.Time = time;
-			wave.Entries.Add(entry);
-		}
-		return wave;
+            // Get a random rocket type.
+            int type = detRand.Next(0, 4);
+            switch (type)
+            {
+                case 0:
+                    entry.Type = "PointAtRocket";
+                    break;
+                case 1:
+                    entry.Type = "ProportionalRocket";
+                    break;
+                case 2:
+                    entry.Type = "Leading";
+                    break;
+                case 3:
+                    entry.Type = "ClusterRocket";
+                    break;
+                default:
+                    entry.Type = "PointAtRocket";
+                    break;
+            }
+
+            // Get a random time.
+            float extraTime = RandInRange(detRand, lowRange, highRange);
+
+            // Calculate the difficulty of this rocket.
+            float diff = GetDifficulty(entry, extraTime, lowRange, highRange);
+
+            // Check if we can spawn this rocket.
+            while (diff > maxDiff)
+            {
+                // Try increasing the time to spawn it.
+                extraTime += (highRange - lowRange) / 10;
+
+                // If we are at the max extratime
+                if (extraTime > highRange)
+                {
+                    extraTime = highRange;
+
+                    // Try making the rocket easier.
+                    bool found = false;
+                    foreach (KeyValuePair<string, float> pair in RocketDifficulty)
+                    {
+                        if (pair.Value < RocketDifficulty[entry.Type])
+                        {
+                            entry.Type = pair.Key;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found == false)
+                    {
+                        // Nothing else we can do to make it any easier, just set _num to 0 and start the next wave.
+                        _num = 0;
+                        return wave;
+                    }
+                }
+
+                // Recalculate the difficulty
+                diff = GetDifficulty(entry, extraTime, lowRange, highRange);
+            }
+
+            // Take the diff away.
+            _num -= diff;
+
+            // Add to the wave
+            if (firstRocket)
+            { // If this is the first rocket, then spawn it first regardless of the time that was previously calculated.
+                firstRocket = false;
+            }
+            else
+            {
+                time += extraTime;
+            }
+            entry.Time = time;
+            wave.Entries.Add(entry);
+        }
+        return wave;
 	}
-	
-	// Calculate a rockets difficulty
-	public static float GetDifficulty(WaveEntry _entry, float _timeSinceLastSpawn, float _lowRange, float _highRange) {
+
+    private static float RandInRange(System.Random _detRand, float _min, float _max)
+    {
+        // Get a random angle.
+        return _min + (_max - _min) * (float)_detRand.NextDouble();
+    }
+
+    // Calculate a rockets difficulty
+    public static float GetDifficulty(WaveEntry _entry, float _timeSinceLastSpawn, float _lowRange, float _highRange) {
 		float diff = RocketDifficulty[_entry.Type]; // The base difficulty.
 		diff += (1 - ((_timeSinceLastSpawn -_lowRange) / (_highRange - _lowRange))) * diff; // The difficulty increases the shorter the time between them.
 		return diff;
@@ -302,9 +320,10 @@ public class WaveManager : MonoBehaviour {
 	
 		
 	// Start
-	public void Start() {
-		// Create the rocket difficulty table.
-		if (RocketDifficulty.Count == 0) {
+	public void Start() {    
+
+        // Create the rocket difficulty table.
+        if (RocketDifficulty.Count == 0) {
 			foreach (RocketDiffListEntry entry in RocketDifficultyList) {
 				RocketDifficulty.Add(entry.RocketType, entry.Difficulty);	
 			}
@@ -374,7 +393,7 @@ public class WaveManager : MonoBehaviour {
 	
 	// Called when the level is restarted.
 	public void RestartLevel() {
-		Stop();	
+        Stop();	
 	}
 	
 	// Save the score
