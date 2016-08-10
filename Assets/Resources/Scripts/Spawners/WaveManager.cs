@@ -344,16 +344,18 @@ public class WaveManager : MonoBehaviour {
 			return;
 		if (player.GetComponent<PlayerDie>().IsDead)
 			return;
-		
-		if (Input.GetKeyDown(KeyCode.R)){
+
+#if DEVELOPMENT_BUILD
+        //Press R to reset saved score to 0
+        if (Input.GetKeyDown(KeyCode.R)){
 			PlayerPrefs.SetInt("PreviousFurthestWave", 0);	
 			PlayerPrefs.SetInt("FurthestWave", 0);	
 			PlayerPrefs.Save();
 		}
-			
-		
-		// Generate random waves?
-		if (GenerateRandomWaves) {
+#endif
+
+        // Generate random waves?
+        if (GenerateRandomWaves) {
 			// If there isn't a wave, generate one.
 			if (currentWave == null) {
 				if (GameObject.FindGameObjectsWithTag("Rocket").Length == 0) {
