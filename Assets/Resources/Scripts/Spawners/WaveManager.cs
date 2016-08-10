@@ -337,9 +337,7 @@ public class WaveManager : MonoBehaviour {
 		textPrefab = TextPrefab;
 		
 		//  Reset things.
-		Stop();
-
-        string.Join()
+		Stop();        
 	}
 	
 	// Update
