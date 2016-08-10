@@ -178,7 +178,10 @@ public class WaveManager : MonoBehaviour {
 		currentWave = null;
 		currentRocket = 0;
 		currentTimer = 0;
-		waveNum = 0;
+
+        // set to the wave to the nearst checkpoint of 5
+        var fw = PlayerPrefs.GetInt("FurthestWave");
+        waveNum = fw - (fw % 5);
 	}
 	
 	// Set the wave to spawn.
@@ -186,18 +189,19 @@ public class WaveManager : MonoBehaviour {
 		// Set the current wave and reset the timer.
 		currentWave = _wave;
 		currentRocket = 0;
-		currentTimer = 0;
-		waveNum++;
+		currentTimer = 0;		
 		
 		// Text.
 		GameObject text = (GameObject)Instantiate(textPrefab);
 		text.GetComponent<GUIText>().text = "Wave " + waveNum.ToString();
-		
-		// Set the position.
-//		text.GetComponent<BounceSizer>().Bounce(20.0f);
-//		text.GetComponent<DeathTimer>().Timer = 10.0f;
-		//text.transform.position = new Vector3(0.5f, 0.5f, 0);
-	}
+
+        waveNum++;
+
+        // Set the position.
+        //		text.GetComponent<BounceSizer>().Bounce(20.0f);
+        //		text.GetComponent<DeathTimer>().Timer = 10.0f;
+        //text.transform.position = new Vector3(0.5f, 0.5f, 0);
+    }
 
 	// Generate a wave worth a certain point.
 	public static Wave GenerateRandomWave(float _num) {
@@ -334,6 +338,8 @@ public class WaveManager : MonoBehaviour {
 		
 		//  Reset things.
 		Stop();
+
+        string.Join()
 	}
 	
 	// Update
@@ -345,13 +351,15 @@ public class WaveManager : MonoBehaviour {
 		if (player.GetComponent<PlayerDie>().IsDead)
 			return;
 
-#if DEVELOPMENT_BUILD
-        //Press R to reset saved score to 0
+#if UNITY_EDITOR
+        // Press R to reset saved FurthestWave to 0
         if (Input.GetKeyDown(KeyCode.R)){
 			PlayerPrefs.SetInt("PreviousFurthestWave", 0);	
 			PlayerPrefs.SetInt("FurthestWave", 0);	
 			PlayerPrefs.Save();
-		}
+            waveNum = 0;
+
+        }
 #endif
 
         // Generate random waves?
@@ -359,7 +367,17 @@ public class WaveManager : MonoBehaviour {
 			// If there isn't a wave, generate one.
 			if (currentWave == null) {
 				if (GameObject.FindGameObjectsWithTag("Rocket").Length == 0) {
-					float difficulty = Mathf.Log((waveNum+1)/10.0f + 1) * 100.0f;
+                    float cNum = waveNum / 5; //checkpoint Numumber
+                    float lSCp = waveNum % 5; // leveles Sinse Checkpoint
+
+                    // The dificulty ramps up quickly to begin with but later checkpoints have smaller dificulty steps.
+                    // http://www.wolframalpha.com/input/?i=plot+%5BLog((x%2B+1)+%2F+10.0+%2B+1)+*+100.0%5D+for+x%3D0..100
+                    float difucyltyRamping = Mathf.Log((cNum + 1) / 10.0f + 1) * 100.0f;
+
+                    // Each consecutive level since the last checkpoint goes up by 10 dificulty points
+                    //http://www.wolframalpha.com/input/?i=plot+%5B(Log(((x%2F+5)+%2B+1)+%2F+10.0+%2B+1)+*+100.0+%2B+(MOD(x,5))+*+10.0)%5D+for+x%3D0..500
+                    float difficulty = difucyltyRamping + lSCp * 10.0f; 
+
 					SpawnWave(GenerateRandomWave(difficulty));	
 				}
 			}
