@@ -219,8 +219,7 @@ public class WaveManager : MonoBehaviour
         // Text.
         GameObject text = (GameObject)Instantiate(textPrefab);
         text.GetComponent<GUIText>().text = "Wave " + waveNum.ToString();
-
-        waveNum++;
+        
 
         // Set the position.
         //		text.GetComponent<BounceSizer>().Bounce(20.0f);
@@ -430,9 +429,10 @@ public class WaveManager : MonoBehaviour
                     currentRocket++;
                 }
             }
-            else
+            else if (GameObject.FindGameObjectsWithTag("Rocket").Length == 0)
             {
                 currentWave = null;
+                waveNum++;
             }
         }
     }
