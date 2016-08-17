@@ -206,6 +206,9 @@ public class WaveManager : MonoBehaviour
         // set to the wave to the nearst checkpoint of 5
         var fw = PlayerPrefs.GetInt("FurthestWave");
         waveNum = fw - (fw % 5);
+
+        if (waveNum == 0)
+            waveNum = 1;
     }
 
     // Set the wave to spawn.
@@ -362,6 +365,9 @@ public class WaveManager : MonoBehaviour
             }
         }
 
+        if(!PlayerPrefs.HasKey("FurthestWave"))
+            PlayerPrefs.SetInt("FurthestWave", 1);
+
         // Set the static reference of the prefab
         textPrefab = TextPrefab;
 
@@ -383,9 +389,7 @@ public class WaveManager : MonoBehaviour
         // Press R to reset saved FurthestWave to 0
         if (Input.GetKeyDown(KeyCode.R))
         {
-            PlayerPrefs.SetInt("PreviousFurthestWave", 0);
-            PlayerPrefs.SetInt("FurthestWave", 0);
-            PlayerPrefs.Save();
+            PlayerPrefs.DeleteAll();
             waveNum = 0;
 
         }
